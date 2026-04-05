@@ -26,11 +26,12 @@ class ModelConfig:
     backend: str
     model: str
     base_url: str
+    enabled: bool = True
     system_prompt: str | None = None
     api_key: str | None = None
     api_key_env: str | None = None
-    temperature: float = 0.7
-    max_tokens: int | None = None
+    temperature: float = 0.0
+    max_tokens: int | None = 600
     headers: dict[str, str] = field(default_factory=dict)
 
     @classmethod
@@ -56,11 +57,12 @@ class ModelConfig:
             backend=backend,
             model=str(data["model"]).strip(),
             base_url=str(data["base_url"]).rstrip("/"),
+            enabled=bool(data.get("enabled", True)),
             system_prompt=data.get("system_prompt"),
             api_key=data.get("api_key"),
             api_key_env=data.get("api_key_env"),
-            temperature=float(data.get("temperature", 0.7)),
-            max_tokens=int(data["max_tokens"]) if data.get("max_tokens") is not None else None,
+            temperature=float(data.get("temperature", 0.0)),
+            max_tokens=int(data.get("max_tokens", 600)) if data.get("max_tokens", 600) is not None else None,
             headers={str(key): str(value) for key, value in headers.items()},
         )
 
@@ -144,7 +146,11 @@ def load_models(path: Path) -> list[ModelConfig]:
     if not isinstance(raw, list) or not raw:
         raise ConfigError("Die Konfiguration muss ein nicht-leeres JSON-Array sein.")
 
-    return [ModelConfig.from_dict(entry) for entry in raw]
+    models = [ModelConfig.from_dict(entry) for entry in raw]
+    enabled_models = [model for model in models if model.enabled]
+    if not enabled_models:
+        raise ConfigError("Keine aktiven Modelle gefunden. Setze mindestens ein Modell auf `enabled: true`.")
+    return enabled_models
 
 
 def post_json(url: str, payload: dict[str, Any], headers: dict[str, str], timeout: int) -> dict[str, Any]:

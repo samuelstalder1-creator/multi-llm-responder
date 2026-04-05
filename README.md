@@ -2,7 +2,7 @@
 
 Kleines `uv`-basiertes Python-CLI, das einen Prompt annimmt und mehrere selbst gehostete LLMs parallel abfragt.
 
-Die Beispielkonfiguration ist auf kleine lokale Modelle fuer ca. `48 GB` GPU-VRAM ausgelegt.
+Die Beispielkonfigurationen decken jetzt kleine, mittlere und groessere lokale Modelle fuer ca. `48 GB` GPU-VRAM ab.
 
 Unterstuetzte Backends:
 
@@ -18,12 +18,14 @@ curl -fsSL https://ollama.com/install.sh | sh
 ollama serve
 ```
 
-In einem zweiten Terminal die Modelle aus der Beispielkonfiguration laden:
+In einem zweiten Terminal die Modelle aus der Standardkonfiguration laden:
 
 ```bash
 ollama pull qwen2.5:3b
 ollama pull qwen2.5:7b
 ollama pull qwen2.5-coder:7b
+ollama pull deepseek-r1:8b
+ollama pull command-r7b:7b
 ollama pull gemma3:4b
 ollama pull llama3.1:8b
 ```
@@ -54,6 +56,11 @@ ollama serve
 
 Wenn `ollama list` leer ist oder "no models loaded" anzeigt, fehlen die lokalen Modelle noch. Fuehre dann die `ollama pull ...` Befehle von oben aus.
 
+Fuer staerkere Einzelmodelle oder einen groesseren Mix gibt es zusaetzlich:
+
+- `models.example.json`: kleine bis mittlere, diverse Modelle
+- `models.large.example.json`: groessere 12B bis 70B Kandidaten, von denen einige standardmaessig deaktiviert sind
+
 ## Konfiguration
 
 Passe `models.example.json` an oder lege eine eigene Datei an:
@@ -64,13 +71,15 @@ Passe `models.example.json` an oder lege eine eigene Datei an:
     "name": "qwen-fast",
     "backend": "ollama",
     "model": "qwen2.5:3b",
-    "base_url": "http://127.0.0.1:11434"
+    "base_url": "http://127.0.0.1:11434",
+    "enabled": true
   },
   {
-    "name": "qwen-balanced",
+    "name": "deepseek-reasoning",
     "backend": "ollama",
-    "model": "qwen2.5:7b",
-    "base_url": "http://127.0.0.1:11434"
+    "model": "deepseek-r1:8b",
+    "base_url": "http://127.0.0.1:11434",
+    "enabled": true
   }
 ]
 ```
@@ -81,41 +90,56 @@ Wichtige Felder:
 - `backend`: `ollama` oder `openai`
 - `model`: Modellname auf dem jeweiligen Server
 - `base_url`: Basis-URL des Servers
-- `system_prompt`: optional
+- `enabled`: optional, Standard `true`; deaktivierte Modelle werden ignoriert
+- `system_prompt`: optional; standardmaessig wird keiner gesetzt
 - `api_key`: optional fuer OpenAI-kompatible Server
 - `api_key_env`: optional, falls der API-Key aus einer Umgebungsvariable gelesen werden soll
-- `temperature`: optional, Standard `0.7`
-- `max_tokens`: optional
+- `temperature`: optional, Standard `0`
+- `max_tokens`: optional, Standard `600`
 - `headers`: optional fuer zusaetzliche HTTP-Header
 
 ## Empfehlung Fuer 48 GB VRAM
 
-Fuer reinen Inference-Betrieb mit kleinen Modellen wuerde ich bei `3B` bis `8B` bleiben. Damit bekommst du mehrere Modelle parallel auf die GPU, statt ein einzelnes groesseres Modell auszureizen.
+Mit `48 GB` VRAM hast du drei sinnvolle Profile:
+
+- viele parallele Modelle: `3B` bis `8B`
+- ausgewogener Mix: `12B` bis `14B`
+- ein sehr starkes Einzelmodell: `24B` bis `35B`, in Grenzfaellen `70B` in aggressiver Quantisierung
 
 Voreinstellung in [models.example.json](models.example.json):
 
 - `qwen2.5:3b` fuer schnelle allgemeine Antworten
 - `qwen2.5:7b` als guter Allrounder
 - `qwen2.5-coder:7b` fuer Coding
+- `deepseek-r1:8b` fuer Reasoning
+- `command-r7b:7b` fuer RAG und Tool-Use
 - `gemma3:4b` fuer kompaktes multilinguales Modell
 - `llama3.1:8b` als zweiter Allrounder
+- optional deaktiviert: `mistral-nemo:12b`, `phi4:14b`, `granite3.3:8b`
 
 Diese Modellgroessen liegen laut den aktuellen Ollama-Library-Seiten vom `5. April 2026` grob bei:
 
 - `qwen2.5:3b`: ca. `1.9 GB`
 - `qwen2.5:7b`: ca. `4.7 GB`
 - `qwen2.5-coder:7b`: ca. `4.7 GB`
+- `deepseek-r1:8b`: ca. `5.2 GB`
+- `command-r7b:7b`: ca. `5.1 GB`
 - `gemma3:4b`: ca. `3.3 GB`
 - `llama3.1:8b`: ca. `4.9 GB`
+- `mistral-nemo:12b`: ca. `7.1 GB`
+- `phi4:14b`: ca. `9.1 GB`
+- `granite3.3:8b`: ca. `4.9 GB`
 
-Das ergibt als grobe Summe nur rund `19.5 GB` Modellgewicht. Der Rest von `48 GB` bleibt fuer KV-Cache, Parallelanfragen und Runtime-Overhead. Das ist eine Inferenz aus den offiziellen Modellgroessen; der echte Bedarf haengt von Quantisierung, Kontextlaenge und Anzahl gleichzeitiger Requests ab.
+Alle aktivierten Standardmodelle zusammen liegen grob bei rund `29.9 GB` Modellgewicht. Das ist auf `48 GB` fuer parallelen Inference-Betrieb realistisch. Das ist eine Inferenz aus den offiziellen Modellgroessen; der echte Bedarf haengt von Quantisierung, Kontextlaenge und Anzahl gleichzeitiger Requests ab.
 
-Modelle laden:
+Standardmodell-Set laden:
 
 ```bash
 ollama pull qwen2.5:3b
 ollama pull qwen2.5:7b
 ollama pull qwen2.5-coder:7b
+ollama pull deepseek-r1:8b
+ollama pull command-r7b:7b
 ollama pull gemma3:4b
 ollama pull llama3.1:8b
 ```
@@ -130,7 +154,29 @@ Wenn du lieber nur drei Modelle parallel fahren willst, wuerde ich diese Auswahl
 
 - `qwen2.5:7b`
 - `qwen2.5-coder:7b`
-- `gemma3:4b` oder `llama3.1:8b`
+- `deepseek-r1:8b` oder `gemma3:4b`
+
+## Groessere Und Diversere Modelle
+
+In [models.large.example.json](models.large.example.json) findest du ein staerkeres Profil mit groesseren und diverseren Modellen:
+
+- `qwen2.5:14b` fuer allgemein starke Antworten
+- `qwen2.5-coder:14b` fuer staerkere Coding-Qualitaet
+- `deepseek-r1:14b` fuer Reasoning
+- `gemma3:12b` fuer multilingual plus spaeter Vision
+- optional deaktiviert: `mistral-small:24b`, `command-r:35b`, `qwen2.5:32b`, `qwen2.5-coder:32b`, `deepseek-r1:32b`, `gemma3:27b`, `llama3.1:70b-text-q4_K_S`
+
+Ein guter 48-GB-Start fuer dieses groessere Profil ist:
+
+```bash
+ollama pull qwen2.5:14b
+ollama pull qwen2.5-coder:14b
+ollama pull deepseek-r1:14b
+ollama pull gemma3:12b
+uv run python -m multi_llm_responder --config models.large.example.json "Hallo Welt"
+```
+
+Wenn du eines der deaktivierten grossen Modelle testen willst, setze in `models.large.example.json` das jeweilige `enabled` auf `true` und deaktiviere andere schwere Modelle entsprechend. Fuer `32B` bis `70B` solltest du in der Praxis meist nur `1` bis `2` solche Modelle gleichzeitig aktiv haben.
 
 ## Troubleshooting
 
@@ -155,6 +201,8 @@ systemctl status ollama
 ```
 
 Wenn dein Modellserver auf einem anderen Rechner oder Container laeuft, ersetze in `models.example.json` die `base_url` von `http://127.0.0.1:11434` auf die echte Host-IP, zum Beispiel `http://192.168.1.50:11434`.
+
+Wenn du `HTTP 404: model '...' not found` siehst, laeuft Ollama zwar, aber das Modell wurde noch nicht mit `ollama pull ...` heruntergeladen.
 
 ## Beispiele
 
