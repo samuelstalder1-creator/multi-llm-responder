@@ -5,7 +5,6 @@ import json
 import os
 import sys
 import textwrap
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -32,6 +31,7 @@ class ModelConfig:
     api_key_env: str | None = None
     temperature: float = 0.0
     max_tokens: int | None = 600
+    keep_alive: str | None = "0s"
     headers: dict[str, str] = field(default_factory=dict)
 
     @classmethod
@@ -63,6 +63,7 @@ class ModelConfig:
             api_key_env=data.get("api_key_env"),
             temperature=float(data.get("temperature", 0.0)),
             max_tokens=int(data.get("max_tokens", 600)) if data.get("max_tokens", 600) is not None else None,
+            keep_alive=str(data.get("keep_alive", "0s")) if data.get("keep_alive", "0s") is not None else None,
             headers={str(key): str(value) for key, value in headers.items()},
         )
 
@@ -87,7 +88,7 @@ class ModelResponse:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m multi_llm_responder",
-        description="Fragt mehrere lokale oder selbst gehostete LLM-Endpunkte parallel ab.",
+        description="Fragt mehrere lokale oder selbst gehostete LLM-Endpunkte ab.",
     )
     parser.add_argument(
         "prompt",
@@ -115,6 +116,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--json",
         action="store_true",
         help="Gibt die Ergebnisse als JSON aus.",
+    )
+    parser.add_argument(
+        "--max-workers",
+        type=int,
+        default=1,
+        help="Maximale Anzahl paralleler Modellanfragen. Standard: 1",
     )
     return parser
 
@@ -236,6 +243,8 @@ def query_ollama_backend(model: ModelConfig, prompt: str, system_prompt: str | N
     }
     if model.max_tokens is not None:
         payload["options"]["num_predict"] = model.max_tokens
+    if model.keep_alive is not None:
+        payload["keep_alive"] = model.keep_alive
 
     data = post_json(f"{model.base_url}/api/chat", payload, model.headers, timeout)
 
@@ -327,13 +336,23 @@ def main() -> int:
         print(f"Konfigurationsfehler: {exc}", file=sys.stderr)
         return 2
 
+    if args.max_workers < 1:
+        print("Konfigurationsfehler: --max-workers muss mindestens 1 sein.", file=sys.stderr)
+        return 2
+
     results: list[ModelResponse] = []
-    with ThreadPoolExecutor(max_workers=len(models)) as pool:
-        future_map = {
-            pool.submit(query_model, model, prompt, args.system, args.timeout): model.name for model in models
-        }
-        for future in as_completed(future_map):
-            results.append(future.result())
+    if args.max_workers == 1:
+        for model in models:
+            results.append(query_model(model, prompt, args.system, args.timeout))
+    else:
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+
+        with ThreadPoolExecutor(max_workers=min(args.max_workers, len(models))) as pool:
+            future_map = {
+                pool.submit(query_model, model, prompt, args.system, args.timeout): model.name for model in models
+            }
+            for future in as_completed(future_map):
+                results.append(future.result())
 
     results.sort(key=lambda item: item.name.lower())
 

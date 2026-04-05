@@ -1,6 +1,6 @@
 # multi-llm-responder
 
-Kleines `uv`-basiertes Python-CLI, das einen Prompt annimmt und mehrere selbst gehostete LLMs parallel abfragt.
+Kleines `uv`-basiertes Python-CLI, das einen Prompt annimmt und mehrere selbst gehostete LLMs nacheinander oder optional parallel abfragt.
 
 Die Beispielkonfiguration deckt jetzt kleine, mittlere und groessere lokale Modelle fuer ca. `48 GB` GPU-VRAM ab.
 
@@ -93,7 +93,9 @@ Wichtige Felder:
 - `api_key_env`: optional, falls der API-Key aus einer Umgebungsvariable gelesen werden soll
 - `temperature`: optional, Standard `0`
 - `max_tokens`: optional, Standard `600`
+- `keep_alive`: optional, Standard `0s`; fuer Ollama wird das Modell nach der Antwort wieder entladen
 - `headers`: optional fuer zusaetzliche HTTP-Header
+- `--max-workers`: optional, Standard `1`; mit `1` laeuft alles sequenziell
 
 ## Empfehlung Fuer 48 GB VRAM
 
@@ -127,7 +129,7 @@ Diese Modellgroessen liegen laut den aktuellen Ollama-Library-Seiten vom `5. Apr
 - `phi4:14b`: ca. `9.1 GB`
 - `granite3.3:8b`: ca. `4.9 GB`
 
-Alle aktivierten Standardmodelle zusammen liegen grob bei rund `29.9 GB` Modellgewicht. Das ist auf `48 GB` fuer parallelen Inference-Betrieb realistisch. Das ist eine Inferenz aus den offiziellen Modellgroessen; der echte Bedarf haengt von Quantisierung, Kontextlaenge und Anzahl gleichzeitiger Requests ab.
+Alle aktivierten Standardmodelle zusammen liegen grob bei rund `29.9 GB` Modellgewicht. Mit dem Default-Verhalten des Tools werden diese Modelle aber nicht gleichzeitig geladen, sondern sequenziell abgearbeitet und danach wieder entladen. Das ist eine Inferenz aus den offiziellen Modellgroessen; der echte Bedarf haengt trotzdem von Quantisierung, Kontextlaenge und Anzahl gleichzeitiger Requests ab.
 
 Standardmodell-Set laden:
 
@@ -202,6 +204,12 @@ uv run python -m multi_llm_responder --config models.example.json "Hallo Welt"
 ```
 
 Wenn du eines der deaktivierten grossen Modelle testen willst, setze in `models.example.json` das jeweilige `enabled` auf `true` und deaktiviere andere schwere Modelle entsprechend. Fuer `32B` bis `70B` solltest du in der Praxis meist nur `1` bis `2` solche Modelle gleichzeitig aktiv haben.
+
+Wenn du trotz realistischer Aktivierung noch Timeouts siehst, starte konservativ und sequenziell:
+
+```bash
+uv run python -m multi_llm_responder --config models.example.json --max-workers 1 --timeout 600 "Hallo Welt"
+```
 
 ## Troubleshooting
 
