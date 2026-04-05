@@ -1,0 +1,10 @@
+[project]
+name = "multi-llm-responder"
+version = "0.1.0"
+description = "CLI zum parallelen Abfragen mehrerer selbst gehosteter LLMs"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.uv]
+package = false

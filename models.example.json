@@ -1,0 +1,21 @@
+[
+  {
+    "name": "qwen-local",
+    "backend": "ollama",
+    "model": "qwen2.5:7b",
+    "base_url": "http://127.0.0.1:11434",
+    "system_prompt": "Antworte kurz und praezise auf Deutsch.",
+    "temperature": 0.3,
+    "max_tokens": 300
+  },
+  {
+    "name": "gemma-vllm",
+    "backend": "openai",
+    "model": "google/gemma-3-12b",
+    "base_url": "http://127.0.0.1:8000/v1",
+    "api_key": "EMPTY",
+    "system_prompt": "Antworte kurz und praezise auf Deutsch.",
+    "temperature": 0.3,
+    "max_tokens": 300
+  }
+]
