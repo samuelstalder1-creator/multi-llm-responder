@@ -11,6 +11,31 @@ Unterstuetzte Backends:
 
 ## Setup
 
+Ollama installieren und starten:
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+ollama serve
+```
+
+In einem zweiten Terminal die Modelle aus der Beispielkonfiguration laden:
+
+```bash
+ollama pull qwen2.5:3b
+ollama pull qwen2.5:7b
+ollama pull qwen2.5-coder:7b
+ollama pull gemma3:4b
+ollama pull llama3.1:8b
+```
+
+Pruefen, ob die Modelle vorhanden sind:
+
+```bash
+ollama list
+```
+
+Danach das CLI starten:
+
 ```bash
 uv run python -m multi_llm_responder --config models.example.json "Hallo Welt"
 ```
@@ -27,7 +52,7 @@ Vor dem ersten Aufruf muss Ollama laufen:
 ollama serve
 ```
 
-In einem zweiten Terminal kannst du dann Modelle laden und das CLI starten.
+Wenn `ollama list` leer ist oder "no models loaded" anzeigt, fehlen die lokalen Modelle noch. Fuehre dann die `ollama pull ...` Befehle von oben aus.
 
 ## Konfiguration
 
@@ -93,6 +118,12 @@ ollama pull qwen2.5:7b
 ollama pull qwen2.5-coder:7b
 ollama pull gemma3:4b
 ollama pull llama3.1:8b
+```
+
+Danach:
+
+```bash
+ollama list
 ```
 
 Wenn du lieber nur drei Modelle parallel fahren willst, wuerde ich diese Auswahl nehmen:
