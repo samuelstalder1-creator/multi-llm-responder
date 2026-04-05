@@ -49,7 +49,7 @@
     "backend": "ollama",
     "model": "mistral-nemo:12b",
     "base_url": "http://127.0.0.1:11434",
-    "enabled": false,
+    "enabled": true,
     "temperature": 0,
     "max_tokens": 600
   },
@@ -58,7 +58,7 @@
     "backend": "ollama",
     "model": "phi4:14b",
     "base_url": "http://127.0.0.1:11434",
-    "enabled": false,
+    "enabled": true,
     "temperature": 0,
     "max_tokens": 600
   },
@@ -85,7 +85,7 @@
     "backend": "ollama",
     "model": "granite3.3:8b",
     "base_url": "http://127.0.0.1:11434",
-    "enabled": false,
+    "enabled": true,
     "temperature": 0,
     "max_tokens": 600
   },
@@ -94,7 +94,7 @@
     "backend": "ollama",
     "model": "qwen2.5:14b",
     "base_url": "http://127.0.0.1:11434",
-    "enabled": false,
+    "enabled": true,
     "temperature": 0,
     "max_tokens": 600
   },
@@ -103,7 +103,7 @@
     "backend": "ollama",
     "model": "qwen2.5-coder:14b",
     "base_url": "http://127.0.0.1:11434",
-    "enabled": false,
+    "enabled": true,
     "temperature": 0,
     "max_tokens": 600
   },
@@ -112,7 +112,7 @@
     "backend": "ollama",
     "model": "deepseek-r1:14b",
     "base_url": "http://127.0.0.1:11434",
-    "enabled": false,
+    "enabled": true,
     "temperature": 0,
     "max_tokens": 600
   },
@@ -121,7 +121,7 @@
     "backend": "ollama",
     "model": "gemma3:12b",
     "base_url": "http://127.0.0.1:11434",
-    "enabled": false,
+    "enabled": true,
     "temperature": 0,
     "max_tokens": 600
   },
@@ -130,7 +130,7 @@
     "backend": "ollama",
     "model": "mistral-small:24b",
     "base_url": "http://127.0.0.1:11434",
-    "enabled": false,
+    "enabled": true,
     "temperature": 0,
     "max_tokens": 600
   },
@@ -139,7 +139,7 @@
     "backend": "ollama",
     "model": "command-r:35b",
     "base_url": "http://127.0.0.1:11434",
-    "enabled": false,
+    "enabled": true,
     "temperature": 0,
     "max_tokens": 600
   },
@@ -148,7 +148,7 @@
     "backend": "ollama",
     "model": "qwen2.5:32b",
     "base_url": "http://127.0.0.1:11434",
-    "enabled": false,
+    "enabled": true,
     "temperature": 0,
     "max_tokens": 600
   },
@@ -157,7 +157,7 @@
     "backend": "ollama",
     "model": "qwen2.5-coder:32b",
     "base_url": "http://127.0.0.1:11434",
-    "enabled": false,
+    "enabled": true,
     "temperature": 0,
     "max_tokens": 600
   },
@@ -166,7 +166,7 @@
     "backend": "ollama",
     "model": "deepseek-r1:32b",
     "base_url": "http://127.0.0.1:11434",
-    "enabled": false,
+    "enabled": true,
     "temperature": 0,
     "max_tokens": 600
   },
@@ -175,7 +175,7 @@
     "backend": "ollama",
     "model": "gemma3:27b",
     "base_url": "http://127.0.0.1:11434",
-    "enabled": false,
+    "enabled": true,
     "temperature": 0,
     "max_tokens": 600
   },
@@ -184,7 +184,7 @@
     "backend": "ollama",
     "model": "llama3.1:70b-text-q4_K_S",
     "base_url": "http://127.0.0.1:11434",
-    "enabled": false,
+    "enabled": true,
     "temperature": 0,
     "max_tokens": 600
   }
