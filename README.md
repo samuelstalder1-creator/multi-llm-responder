@@ -2,7 +2,7 @@
 
 Kleines `uv`-basiertes Python-CLI, das einen Prompt annimmt und mehrere selbst gehostete LLMs parallel abfragt.
 
-Die Beispielkonfigurationen decken jetzt kleine, mittlere und groessere lokale Modelle fuer ca. `48 GB` GPU-VRAM ab.
+Die Beispielkonfiguration deckt jetzt kleine, mittlere und groessere lokale Modelle fuer ca. `48 GB` GPU-VRAM ab.
 
 Unterstuetzte Backends:
 
@@ -56,10 +56,7 @@ ollama serve
 
 Wenn `ollama list` leer ist oder "no models loaded" anzeigt, fehlen die lokalen Modelle noch. Fuehre dann die `ollama pull ...` Befehle von oben aus.
 
-Fuer staerkere Einzelmodelle oder einen groesseren Mix gibt es zusaetzlich:
-
-- `models.example.json`: kleine bis mittlere, diverse Modelle
-- `models.large.example.json`: groessere 12B bis 70B Kandidaten, von denen einige standardmaessig deaktiviert sind
+Alle Modelle liegen in einer Datei: `models.example.json`. Schwere Modelle sind dort per `enabled: false` standardmaessig deaktiviert.
 
 ## Konfiguration
 
@@ -158,7 +155,7 @@ Wenn du lieber nur drei Modelle parallel fahren willst, wuerde ich diese Auswahl
 
 ## Groessere Und Diversere Modelle
 
-In [models.large.example.json](models.large.example.json) findest du ein staerkeres Profil mit groesseren und diverseren Modellen:
+In [models.example.json](/Users/ssl/Documents/github/multi-llm-responder/models.example.json) findest du jetzt auch die groesseren und diverseren Modelle:
 
 - `qwen2.5:14b` fuer allgemein starke Antworten
 - `qwen2.5-coder:14b` fuer staerkere Coding-Qualitaet
@@ -173,10 +170,10 @@ ollama pull qwen2.5:14b
 ollama pull qwen2.5-coder:14b
 ollama pull deepseek-r1:14b
 ollama pull gemma3:12b
-uv run python -m multi_llm_responder --config models.large.example.json "Hallo Welt"
+uv run python -m multi_llm_responder --config models.example.json "Hallo Welt"
 ```
 
-Wenn du eines der deaktivierten grossen Modelle testen willst, setze in `models.large.example.json` das jeweilige `enabled` auf `true` und deaktiviere andere schwere Modelle entsprechend. Fuer `32B` bis `70B` solltest du in der Praxis meist nur `1` bis `2` solche Modelle gleichzeitig aktiv haben.
+Wenn du eines der deaktivierten grossen Modelle testen willst, setze in `models.example.json` das jeweilige `enabled` auf `true` und deaktiviere andere schwere Modelle entsprechend. Fuer `32B` bis `70B` solltest du in der Praxis meist nur `1` bis `2` solche Modelle gleichzeitig aktiv haben.
 
 ## Troubleshooting
 
