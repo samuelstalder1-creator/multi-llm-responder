@@ -18,7 +18,7 @@ curl -fsSL https://ollama.com/install.sh | sh
 ollama serve
 ```
 
-In einem zweiten Terminal die Modelle aus der Standardkonfiguration laden:
+In einem zweiten Terminal die aktivierten Standardmodelle laden:
 
 ```bash
 ollama pull qwen2.5:3b
@@ -152,6 +152,34 @@ Wenn du lieber nur drei Modelle parallel fahren willst, wuerde ich diese Auswahl
 - `qwen2.5:7b`
 - `qwen2.5-coder:7b`
 - `deepseek-r1:8b` oder `gemma3:4b`
+
+Alle Modelle aus `models.example.json` laden:
+
+```bash
+ollama pull qwen2.5:3b
+ollama pull qwen2.5:7b
+ollama pull qwen2.5-coder:7b
+ollama pull deepseek-r1:8b
+ollama pull command-r7b:7b
+ollama pull mistral-nemo:12b
+ollama pull phi4:14b
+ollama pull gemma3:4b
+ollama pull llama3.1:8b
+ollama pull granite3.3:8b
+ollama pull qwen2.5:14b
+ollama pull qwen2.5-coder:14b
+ollama pull deepseek-r1:14b
+ollama pull gemma3:12b
+ollama pull mistral-small:24b
+ollama pull command-r:35b
+ollama pull qwen2.5:32b
+ollama pull qwen2.5-coder:32b
+ollama pull deepseek-r1:32b
+ollama pull gemma3:27b
+ollama pull llama3.1:70b-text-q4_K_S
+```
+
+Wenn du wirklich alle Modelle ziehst, brauchst du entsprechend viel SSD-Speicher. Fuer `48 GB` VRAM ist das sinnvoll als Modellpool, aber nicht als gleichzeitig aktivierter Inference-Mix.
 
 ## Groessere Und Diversere Modelle
 
