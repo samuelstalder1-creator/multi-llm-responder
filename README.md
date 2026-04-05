@@ -21,6 +21,14 @@ Alternativ:
 python -m multi_llm_responder "Hallo Welt"
 ```
 
+Vor dem ersten Aufruf muss Ollama laufen:
+
+```bash
+ollama serve
+```
+
+In einem zweiten Terminal kannst du dann Modelle laden und das CLI starten.
+
 ## Konfiguration
 
 Passe `models.example.json` an oder lege eine eigene Datei an:
@@ -92,6 +100,30 @@ Wenn du lieber nur drei Modelle parallel fahren willst, wuerde ich diese Auswahl
 - `qwen2.5:7b`
 - `qwen2.5-coder:7b`
 - `gemma3:4b` oder `llama3.1:8b`
+
+## Troubleshooting
+
+Wenn du `Connection refused` auf Ubuntu siehst, ist fast immer der lokale Ollama-Dienst nicht gestartet oder die `base_url` zeigt auf den falschen Host.
+
+Pruefen, ob Ollama antwortet:
+
+```bash
+curl http://127.0.0.1:11434/api/tags
+```
+
+Falls keine Antwort kommt, starte Ollama:
+
+```bash
+ollama serve
+```
+
+Falls Ollama als Service installiert ist, kannst du je nach Setup auch pruefen:
+
+```bash
+systemctl status ollama
+```
+
+Wenn dein Modellserver auf einem anderen Rechner oder Container laeuft, ersetze in `models.example.json` die `base_url` von `http://127.0.0.1:11434` auf die echte Host-IP, zum Beispiel `http://192.168.1.50:11434`.
 
 ## Beispiele
 

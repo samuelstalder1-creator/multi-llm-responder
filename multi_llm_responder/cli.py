@@ -260,13 +260,42 @@ def query_model(model: ModelConfig, prompt: str, system_override: str | None, ti
             content=content,
         )
     except Exception as exc:  # noqa: BLE001 - CLI should show per-model errors.
+        error_message = format_backend_error(model, exc)
         return ModelResponse(
             name=model.name,
             backend=model.backend,
             model=model.model,
             ok=False,
-            error=str(exc),
+            error=error_message,
         )
+
+
+def format_backend_error(model: ModelConfig, exc: Exception) -> str:
+    raw_error = str(exc)
+
+    if "Connection refused" in raw_error or "[Errno 111]" in raw_error:
+        if model.backend == "ollama":
+            return (
+                f"{raw_error}. Ollama ist auf {model.base_url} nicht erreichbar. "
+                "Starte `ollama serve` oder passe `base_url` in der Konfiguration an."
+            )
+        return (
+            f"{raw_error}. Der OpenAI-kompatible Server ist auf {model.base_url} nicht erreichbar. "
+            "Starte den Server oder passe `base_url` an."
+        )
+
+    if "timed out" in raw_error.lower():
+        return (
+            f"{raw_error}. Der Server unter {model.base_url} hat nicht rechtzeitig geantwortet. "
+            "Erhoehe `--timeout` oder pruefe die Serverlast."
+        )
+
+    if "Operation not permitted" in raw_error:
+        return (
+            f"{raw_error}. In dieser Umgebung sind lokale HTTP-Verbindungen blockiert oder nicht erlaubt."
+        )
+
+    return raw_error
 
 
 def format_text_output(prompt: str, results: list[ModelResponse]) -> str:
